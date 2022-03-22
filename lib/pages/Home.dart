@@ -42,8 +42,7 @@ class _HomeState extends State<Home>{
                 image: new DecorationImage(image: new AssetImage("images/background.png"), fit: BoxFit.cover,),
               ),
             ),
-          SingleChildScrollView(
-            child: Center(
+            Center(
               child: Container(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -111,7 +110,6 @@ class _HomeState extends State<Home>{
                 ),
               ),
             ),
-          )
         ],
       )
     );
