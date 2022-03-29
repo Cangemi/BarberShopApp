@@ -2,37 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 
-class Login extends StatelessWidget {
-  const Login({Key? key}) : super(key: key);
-
-
+class Login extends StatefulWidget {
+  const Login({ Key? key }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  State<Login> createState() => _LoginState();
+}
 
-    Color yellowAccent= Colors.yellowAccent;
+class _LoginState extends State<Login> {
+      Color yellowAccent= Colors.yellowAccent;
     Color black = Colors.black87;
     Color yellow= Colors.yellow;
     Color white = Colors.white;
 
-    var size = MediaQuery.of(context).size;
-    double height = size.height;
-    var width = size.width;
-
     TextEditingController email = TextEditingController();
     TextEditingController senha = TextEditingController();
     var form = GlobalKey<FormState>();
+  @override
+  Widget build(BuildContext context) {
 
+
+    
+    var size = MediaQuery.of(context).size;
+    double height = size.height;
+    var width = size.width;
     return Scaffold(
       body: Stack(
         children: [
           Container(
-            decoration: new BoxDecoration(
-              image: new DecorationImage(image: new AssetImage("images/background.png"), fit: BoxFit.cover,),
+            height: height,
+            decoration: const BoxDecoration(
+              image: DecorationImage(image: AssetImage("images/background.png"), fit: BoxFit.cover,),
             ),
           ),
-          Container(
-                padding: EdgeInsets.all(41),
+          SingleChildScrollView(
+            child: Container(
+                padding: const EdgeInsets.all(41),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -69,31 +74,34 @@ class Login extends StatelessWidget {
                           textField("Senha", senha,"123456"),
                         ],
                         )
-                      )
+                      ),
+                    // SizedBox(
+                    //   height: height*0.35,
+                    // ),
                   ],
                 ),
-              )
+              ),
+          )
         ],
       ),
     );
   }
-
   textField(label, variable, hint){
     return TextFormField(
-      style: TextStyle(
+      style: const TextStyle(
         color: Colors.white
       ),
       cursorColor: Colors.white,
       controller:  variable,
       decoration: InputDecoration(
-        floatingLabelBehavior: FloatingLabelBehavior.always,
+         floatingLabelBehavior: FloatingLabelBehavior.always,
         hintText: hint,
-        hintStyle: TextStyle(
+        hintStyle: const  TextStyle(
                           fontSize: 16,
                           color: Colors.white,
                         ),
         labelText: label,
-        labelStyle: TextStyle(
+        labelStyle: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
                           color: Colors.white,

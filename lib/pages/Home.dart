@@ -48,25 +48,25 @@ class _HomeState extends State<Home>{
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    const SizedBox(
-                      height: 20,
-                    ),
+                    // const SizedBox(
+                    //   height: 15,
+                    // ),
                     Text("BarberShop",
                         style: GoogleFonts.pacifico(
                           fontSize: 35,
                           color: yellowAccent,
                           fontStyle: FontStyle.italic,
                         )),
+                    // const SizedBox(
+                    //   height: 15,
+                    // ),
+                    buildCalendar(),
                     const SizedBox(
                       height: 20,
                     ),
-                    buildCalendar(),
-                    const SizedBox(
-                      height: 30,
-                    ),
                     CustomTabBar(list: hourList,backgroundColor: black,borderColor: yellowAccent,textColor:  yellowAccent,),
                     const SizedBox(
-                      height: 30,
+                      height: 25,
                     ),
                     //Text(tabControllerDays.index.toString(),style: TextStyle(color: Colors.yellowAccent),),
                     // Text(
