@@ -3,24 +3,21 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../widgets/CustomElevatedButton.dart';
 import '../widgets/CustomTextField.dart';
-import 'Register.dart';
 
-class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+class Register extends StatefulWidget {
+  const Register({Key? key}) : super(key: key);
 
   @override
-  State<Login> createState() => _LoginState();
+  State<Register> createState() => _RegisterState();
 }
 
-class _LoginState extends State<Login> {
+class _RegisterState extends State<Register> {
   Color yellowAccent = Colors.yellowAccent;
   Color black = Colors.black87;
   Color yellow = Colors.yellow;
   Color white = Colors.white;
-  String message = " ";
-  final String _email = "email@email.com";
-  final String _senha = "123456";
 
+  TextEditingController nome = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController senha = TextEditingController();
   var form = GlobalKey<FormState>();
@@ -47,11 +44,7 @@ class _LoginState extends State<Login> {
             child: Container(
               padding: const EdgeInsets.all(41),
               child: Column(
-                // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  // SizedBox(
-                  //   height: height * 0.01,
-                  // ),
                   Text("BarberShop",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.pacifico(
@@ -63,7 +56,7 @@ class _LoginState extends State<Login> {
                     height: height * 0.01,
                   ),
                   Text(
-                    "Para realizar o agendamento é preciso estar logado.",
+                    "Cadastre-se gratuitamente para agendar seu atendimento.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 20,
@@ -79,53 +72,34 @@ class _LoginState extends State<Login> {
                     key: form,
                     children: [
                       CustomTextField(
+                        textEditingController: nome,
+                        label: "Nome",
+                        controller: (TextEditingController value) => nome,
+                        hint: "José Fernando da Silva",
+                        password: false,
+                      ),
+                      CustomTextField(
                         textEditingController: email,
                         label: "E-mail",
-                        controller: (TextEditingController value) =>
-                            email = value,
+                        controller: (TextEditingController value) => email,
                         hint: "josefernando21@gmail.com",
                         password: false,
                       ),
                       CustomTextField(
                         textEditingController: senha,
                         label: "Senha",
-                        controller: (TextEditingController value) =>
-                            senha = value,
+                        controller: (TextEditingController value) => senha,
                         hint: "********",
                         password: true,
                       ),
                     ],
                   )),
-                  message == " "
-                      ? Container()
-                      : Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          width: double.infinity,
-                          child: Text(
-                            message,
-                            textAlign: TextAlign.left,
-                            style: const TextStyle(
-                                color: Colors.redAccent,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w200),
-                          ),
-                        ),
                   CustomElevatedButton(
-                    onPressed: () {
-                      if (email.text != _email || senha.text != _senha) {
-                        setState(() {
-                          message = "* Email ou senha invalidos";
-                        });
-                      } else {
-                        setState(() {
-                          message = " ";
-                        });
-                      }
-                    },
+                    onPressed: () {},
                     backgroundColor: yellowAccent,
                     textColor: black,
-                    text: "Entrar",
-                    fontSize: 16,
+                    text: "CONFIRMAR CADASTRO",
+                    fontSize: 14,
                   ),
                   SizedBox(
                     height: height * 0.03,
@@ -164,33 +138,35 @@ class _LoginState extends State<Login> {
                     icon: "images/googleIcon.png",
                     backgroundColor: white,
                     textColor: black,
-                    text: "Entrar com o Google",
+                    text: "Cadastre-se com o Google",
                     fontSize: 14,
                   ),
                   SizedBox(
                     height: height * 0.03,
                   ),
-                  Text(
-                    "Não tem cadastro?",
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: white),
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Register()));
-                      },
-                      child: Text(
-                        "Clique aqui e cadastre-se!",
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Já tem cadastro? ",
                         style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: yellowAccent),
-                      ))
+                            fontWeight: FontWeight.w500,
+                            color: white),
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            "Clique aqui.",
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: yellowAccent),
+                          ))
+                    ],
+                  )
                 ],
               ),
             ),
