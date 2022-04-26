@@ -5,35 +5,35 @@ class CustomTabBar extends StatefulWidget {
   final Color backgroundColor;
   final Color borderColor;
   final Color textColor;
-  const CustomTabBar({Key? key,
-    required this.list,
-    required this.backgroundColor,
-    required this.borderColor,
-    required this.textColor
-  }) : super(key: key);
+  const CustomTabBar(
+      {Key? key,
+      required this.list,
+      required this.backgroundColor,
+      required this.borderColor,
+      required this.textColor})
+      : super(key: key);
 
   @override
   _CustomTabBarState createState() => _CustomTabBarState();
 }
 
-class _CustomTabBarState extends State<CustomTabBar> with SingleTickerProviderStateMixin  {
-
+class _CustomTabBarState extends State<CustomTabBar>
+    with SingleTickerProviderStateMixin {
   late TabController tabController;
   List<Widget> widgetList = [];
 
-  widgetListMaker(List list){
-    for(String text in list){
-      widgetList.add(buildTab(text));
+  widgetListMaker(List list) {
+    for (String text in list) {
+      widgetList.add(buildTab(text, widget.textColor));
     }
   }
 
-
-  Container buildTab(String text) {
+  Container buildTab(String text, Color color) {
     return Container(
         padding: const EdgeInsetsDirectional.all(10),
         child: Text(
           text,
-          style: TextStyle(color: widget.textColor),
+          style: TextStyle(color: color),
         ));
   }
 
@@ -42,7 +42,6 @@ class _CustomTabBarState extends State<CustomTabBar> with SingleTickerProviderSt
     tabController = TabController(length: widget.list.length, vsync: this);
     widgetListMaker(widget.list);
     super.initState();
-
   }
 
   @override
@@ -58,10 +57,8 @@ class _CustomTabBarState extends State<CustomTabBar> with SingleTickerProviderSt
         isScrollable: true,
         indicator: BoxDecoration(
             color: widget.backgroundColor,
-            border:
-            Border.all(width: 2, color: widget.borderColor),
-            borderRadius:
-            const BorderRadius.all(Radius.circular(10))),
+            border: Border.all(width: 2, color: widget.borderColor),
+            borderRadius: const BorderRadius.all(Radius.circular(10))),
         tabs: widgetList);
   }
 }

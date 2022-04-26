@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../widgets/CustomElevatedButton.dart';
 import '../widgets/CustomTextField.dart';
 import 'Register.dart';
+import 'Home.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -112,6 +113,10 @@ class _LoginState extends State<Login> {
                         ),
                   CustomElevatedButton(
                     onPressed: () {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Home()));
                       if (email.text != _email || senha.text != _senha) {
                         setState(() {
                           message = "* Email ou senha invalidos";
