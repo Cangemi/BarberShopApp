@@ -84,7 +84,7 @@ class _LoginState extends State<Login> {
                         label: "E-mail",
                         controller: (TextEditingController value) =>
                             email = value,
-                        hint: "josefernando21@gmail.com",
+                        hint: _email,
                         password: false,
                       ),
                       CustomTextField(

@@ -1,11 +1,12 @@
 import 'package:barber_shop_app/widgets/CustomTabBar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../widgets/CustomElevatedButton.dart';
+
 class Calendar extends StatefulWidget {
-  const Calendar({Key? key}) : super(key: key);
+  final Function returnValues;
+  const Calendar({Key? key, required this.returnValues}) : super(key: key);
 
   @override
   _HomeState createState() => _HomeState();
@@ -15,6 +16,7 @@ class _HomeState extends State<Calendar> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
+  String _hour = " ";
   Color yellowAccent = Colors.yellowAccent;
   Color black = Colors.black87;
   Color yellow = Colors.yellow;
@@ -32,101 +34,56 @@ class _HomeState extends State<Calendar> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     double height = size.height;
-    return Stack(
-      children: [
-        Container(
-          height: height,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("images/background.png"),
-              fit: BoxFit.cover,
-            ),
+    return SingleChildScrollView(
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Text(
+                "Agendamento",
+                style: TextStyle(
+                    color: white, fontWeight: FontWeight.bold, fontSize: 22),
+              ),
+              SizedBox(
+                height: height * 0.02,
+              ),
+              Text(
+                "Escolha a data e horário:",
+                style: TextStyle(
+                    color: white, fontWeight: FontWeight.normal, fontSize: 16),
+              ),
+              SizedBox(
+                height: height * 0.02,
+              ),
+              buildCalendar(),
+              SizedBox(
+                height: height * 0.02,
+              ),
+              CustomTabBar(
+                list: hourList,
+                backgroundColor: black,
+                borderColor: yellowAccent,
+                textColor: yellowAccent,
+                returnHour: (String value) => _hour = value,
+              ),
+              SizedBox(
+                height: height * 0.02,
+              ),
+              CustomElevatedButton(
+                  backgroundColor: yellowAccent,
+                  textColor: black,
+                  text: "CONFIRMAR AGENDAMENTO",
+                  fontSize: 16,
+                  onPressed: () {
+                    widget.returnValues(context, _selectedDay.day,
+                        _selectedDay.weekday, _selectedDay.month, _hour);
+                  })
+            ],
           ),
         ),
-        Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            backgroundColor: yellow,
-            title: Center(
-                child: Text("BarberShop",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.pacifico(
-                      fontSize: 25,
-                      color: black,
-                      fontStyle: FontStyle.italic,
-                    ))),
-          ),
-          body: SingleChildScrollView(
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
-                    Text(
-                      "Agendamento",
-                      style: TextStyle(
-                          color: white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22),
-                    ),
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
-                    Text(
-                      "Escolha a data e horário:",
-                      style: TextStyle(
-                          color: white,
-                          fontWeight: FontWeight.normal,
-                          fontSize: 16),
-                    ),
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
-                    buildCalendar(),
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
-                    CustomTabBar(
-                      list: hourList,
-                      backgroundColor: black,
-                      borderColor: yellowAccent,
-                      textColor: yellowAccent,
-                    ),
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
-                    TextButton(
-                        onPressed: () {
-                          print(_selectedDay.weekday.toString());
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 10),
-                          decoration: BoxDecoration(
-                              color: yellow,
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(5),
-                              )),
-                          padding: const EdgeInsets.only(
-                              top: 15, bottom: 15, right: 20, left: 20),
-                          child: Text(
-                            "CONFIRMAR AGENDAMENTO",
-                            style: TextStyle(
-                                color: black, fontWeight: FontWeight.bold),
-                          ),
-                        ))
-                  ],
-                ),
-              ),
-            ),
-          ),
-        )
-      ],
+      ),
     );
   }
 
@@ -137,11 +94,11 @@ class _HomeState extends State<Calendar> {
         color: black,
         border: Border.all(width: 2, color: yellowAccent),
         borderRadius: const BorderRadius.all(
-          Radius.circular(10),
+          Radius.circular(5),
         ),
       ),
       child: TableCalendar(
-        rowHeight: 40,
+        rowHeight: 35,
         firstDay: DateTime.utc(2022, 01, 01),
         lastDay: DateTime.utc(2050, 12, 31),
         focusedDay: _focusedDay,

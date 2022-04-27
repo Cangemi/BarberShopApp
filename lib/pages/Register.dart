@@ -20,6 +20,7 @@ class _RegisterState extends State<Register> {
   TextEditingController nome = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController senha = TextEditingController();
+  TextEditingController ConfirmacaoSenha = TextEditingController();
   var form = GlobalKey<FormState>();
 
   @override
@@ -74,21 +75,32 @@ class _RegisterState extends State<Register> {
                       CustomTextField(
                         textEditingController: nome,
                         label: "Nome",
-                        controller: (TextEditingController value) => nome,
+                        controller: (TextEditingController value) =>
+                            nome = value,
                         hint: "José Fernando da Silva",
                         password: false,
                       ),
                       CustomTextField(
                         textEditingController: email,
                         label: "E-mail",
-                        controller: (TextEditingController value) => email,
+                        controller: (TextEditingController value) =>
+                            email = value,
                         hint: "josefernando21@gmail.com",
                         password: false,
                       ),
                       CustomTextField(
                         textEditingController: senha,
                         label: "Senha",
-                        controller: (TextEditingController value) => senha,
+                        controller: (TextEditingController value) =>
+                            senha = value,
+                        hint: "********",
+                        password: true,
+                      ),
+                      CustomTextField(
+                        textEditingController: ConfirmacaoSenha,
+                        label: "Confirmar senha",
+                        controller: (TextEditingController value) =>
+                            ConfirmacaoSenha = value,
                         hint: "********",
                         password: true,
                       ),

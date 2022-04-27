@@ -5,12 +5,14 @@ class CustomTabBar extends StatefulWidget {
   final Color backgroundColor;
   final Color borderColor;
   final Color textColor;
+  final Function returnHour;
   const CustomTabBar(
       {Key? key,
       required this.list,
       required this.backgroundColor,
       required this.borderColor,
-      required this.textColor})
+      required this.textColor,
+      required this.returnHour})
       : super(key: key);
 
   @override
@@ -53,6 +55,9 @@ class _CustomTabBarState extends State<CustomTabBar>
   @override
   Widget build(BuildContext context) {
     return TabBar(
+        onTap: (value) {
+          widget.returnHour(widget.list[value]);
+        },
         controller: tabController,
         isScrollable: true,
         indicator: BoxDecoration(
