@@ -77,8 +77,12 @@ class _HomeState extends State<Calendar> {
                   text: "CONFIRMAR AGENDAMENTO",
                   fontSize: 16,
                   onPressed: () {
-                    widget.returnValues(context, _selectedDay.day,
-                        _selectedDay.weekday, _selectedDay.month, _hour);
+                    widget.returnValues(
+                        context,
+                        _selectedDay.day,
+                        _selectedDay.weekday,
+                        _selectedDay.month,
+                        _hour == " " ? hourList[0] : _hour);
                   })
             ],
           ),

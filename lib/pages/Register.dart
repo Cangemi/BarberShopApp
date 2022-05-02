@@ -20,8 +20,21 @@ class _RegisterState extends State<Register> {
   TextEditingController nome = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController senha = TextEditingController();
-  TextEditingController ConfirmacaoSenha = TextEditingController();
+  TextEditingController confirmacaoSenha = TextEditingController();
   var form = GlobalKey<FormState>();
+
+  message(String text) {
+    final snackBar = SnackBar(
+      backgroundColor: black,
+      shape: Border(top: BorderSide(color: yellowAccent, width: 3)),
+      content: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(color: white, fontSize: 16),
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,17 +110,24 @@ class _RegisterState extends State<Register> {
                         password: true,
                       ),
                       CustomTextField(
-                        textEditingController: ConfirmacaoSenha,
+                        textEditingController: confirmacaoSenha,
                         label: "Confirmar senha",
                         controller: (TextEditingController value) =>
-                            ConfirmacaoSenha = value,
+                            confirmacaoSenha = value,
                         hint: "********",
                         password: true,
                       ),
                     ],
                   )),
                   CustomElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      if (nome.text.isEmpty ||
+                          email.text.isEmpty ||
+                          senha.text.isEmpty ||
+                          confirmacaoSenha.text.isEmpty) {
+                        message("Preencha todos os campos");
+                      } else {}
+                    },
                     backgroundColor: yellowAccent,
                     textColor: black,
                     text: "CONFIRMAR CADASTRO",

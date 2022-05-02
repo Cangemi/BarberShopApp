@@ -18,13 +18,25 @@ class _LoginState extends State<Login> {
   Color black = Colors.black87;
   Color yellow = Colors.yellow;
   Color white = Colors.white;
-  String message = " ";
   final String _email = "email@email.com";
   final String _senha = "123456";
 
   TextEditingController email = TextEditingController();
   TextEditingController senha = TextEditingController();
   var form = GlobalKey<FormState>();
+
+  message(String text) {
+    final snackBar = SnackBar(
+      backgroundColor: black,
+      shape: Border(top: BorderSide(color: yellowAccent, width: 3)),
+      content: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(color: white, fontSize: 16),
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,20 +109,6 @@ class _LoginState extends State<Login> {
                       ),
                     ],
                   )),
-                  message == " "
-                      ? Container()
-                      : Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          width: double.infinity,
-                          child: Text(
-                            message,
-                            textAlign: TextAlign.left,
-                            style: const TextStyle(
-                                color: Colors.redAccent,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w200),
-                          ),
-                        ),
                   CustomElevatedButton(
                     onPressed: () {
                       Navigator.pushReplacement(
@@ -118,14 +116,8 @@ class _LoginState extends State<Login> {
                           MaterialPageRoute(
                               builder: (context) => const Home()));
                       if (email.text != _email || senha.text != _senha) {
-                        setState(() {
-                          message = "* Email ou senha invalidos";
-                        });
-                      } else {
-                        setState(() {
-                          message = " ";
-                        });
-                      }
+                        message("Email ou Senha incorreto");
+                      } else {}
                     },
                     backgroundColor: yellowAccent,
                     textColor: black,

@@ -48,7 +48,7 @@ class PreviousAppointments extends StatelessWidget {
           month: 2,
           hour: "18:30",
           service: "Corte Kids",
-        )
+        ),
       ],
     );
   }

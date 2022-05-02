@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/Appointments.dart';
 import '../widgets/CustomElevatedButton.dart';
 import 'Calendar.dart';
 
@@ -11,7 +12,12 @@ class Booking extends StatefulWidget {
 }
 
 class _BookingState extends State<Booking> {
-  late String service;
+  int flag = 0;
+  int _day = 0;
+  int _weekDay = 0;
+  int _month = 0;
+  String _hour = "";
+  String service = "";
   Color yellowAccent = Colors.yellowAccent;
   Color black = Colors.black87;
   Color yellow = Colors.yellow;
@@ -21,115 +27,204 @@ class _BookingState extends State<Booking> {
   Color colorThree = Colors.yellow;
   Color colorFour = Colors.yellow;
 
+  message(String text) {
+    final snackBar = SnackBar(
+      backgroundColor: black,
+      shape: Border(top: BorderSide(color: yellowAccent, width: 3)),
+      content: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(color: white, fontSize: 16),
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
-    return Container(
-      padding: const EdgeInsets.only(left: 20, right: 20),
-      child: Center(
-          child: Column(
-        children: [
-          SizedBox(
-            height: height * 0.04,
-          ),
-          Text(
-            "Como podemos te ajudar?",
-            style: TextStyle(
-                color: white, fontWeight: FontWeight.bold, fontSize: 22),
-          ),
-          SizedBox(
-            height: height * 0.02,
-          ),
-          Text(
-            "Clique no serviço que você precisa.",
-            style: TextStyle(
-                color: white, fontWeight: FontWeight.normal, fontSize: 16),
-          ),
-          SizedBox(
-            height: height * 0.035,
-          ),
-          Container(
-              height: height * 0.45,
-              // padding: const EdgeInsets.only(left: 20, right: 20),
-              child: GridView.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: 15,
-                crossAxisSpacing: 15,
-                childAspectRatio: MediaQuery.of(context).size.aspectRatio * 1.9,
+
+    return SingleChildScrollView(
+      child: _day == 0
+          ? Container(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: Center(
+                  child: Column(
                 children: [
-                  buildServices(
-                      context,
-                      "https://images.pexels.com/photos/10024234/pexels-photo-10024234.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-                      "BARBA",
-                      colorOne,
-                      1),
-                  buildServices(
-                      context,
-                      "https://images.pexels.com/photos/1804638/pexels-photo-1804638.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-                      "CABELO",
-                      colorTwo,
-                      2),
-                  buildServices(
-                      context,
-                      "https://images.pexels.com/photos/7697394/pexels-photo-7697394.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-                      "CORTE KIDS",
-                      colorThree,
-                      3),
-                  buildServices(
-                      context,
-                      "https://images.pexels.com/photos/3998404/pexels-photo-3998404.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940flutter",
-                      "COMPLETO",
-                      colorFour,
-                      4),
+                  SizedBox(
+                    height: height * 0.04,
+                  ),
+                  Text(
+                    "Como podemos te ajudar?",
+                    style: TextStyle(
+                        color: white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22),
+                  ),
+                  SizedBox(
+                    height: height * 0.02,
+                  ),
+                  Text(
+                    "Clique no serviço que você precisa.",
+                    style: TextStyle(
+                        color: white,
+                        fontWeight: FontWeight.normal,
+                        fontSize: 16),
+                  ),
+                  SizedBox(
+                    height: height * 0.035,
+                  ),
+                  Container(
+                      height: height * 0.45,
+                      // padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: GridView.count(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 15,
+                        crossAxisSpacing: 15,
+                        childAspectRatio:
+                            MediaQuery.of(context).size.aspectRatio * 1.9,
+                        children: [
+                          buildServices(
+                              context,
+                              "https://images.pexels.com/photos/10024234/pexels-photo-10024234.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+                              "BARBA",
+                              colorOne,
+                              1),
+                          buildServices(
+                              context,
+                              "https://images.pexels.com/photos/1804638/pexels-photo-1804638.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+                              "CABELO",
+                              colorTwo,
+                              2),
+                          buildServices(
+                              context,
+                              "https://images.pexels.com/photos/7697394/pexels-photo-7697394.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+                              "CORTE KIDS",
+                              colorThree,
+                              3),
+                          buildServices(
+                              context,
+                              "https://images.pexels.com/photos/3998404/pexels-photo-3998404.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940flutter",
+                              "COMPLETO",
+                              colorFour,
+                              4),
+                        ],
+                      )),
+                  CustomElevatedButton(
+                    backgroundColor: yellowAccent,
+                    textColor: black,
+                    text: "ESCOLHER DATA E HORÁRIO",
+                    fontSize: 16,
+                    onPressed: () {
+                      if (service == "") {
+                        message("Escolha um serviço");
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return Material(
+                                color: Colors.transparent,
+                                child: Container(
+                                  constraints: const BoxConstraints.expand(),
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                          width: 2,
+                                          color: yellowAccent,
+                                          style: BorderStyle.solid),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(10),
+                                      ),
+                                      image: const DecorationImage(
+                                        image:
+                                            AssetImage("images/background.png"),
+                                        fit: BoxFit.cover,
+                                      )),
+                                  // decoration: BoxDecoration(color: black),
+                                  margin: EdgeInsets.only(
+                                      top: height * 0.04,
+                                      right: 10,
+                                      left: 10,
+                                      bottom: height * 0.04),
+                                  child: Calendar(
+                                    returnValues: (var context, int day,
+                                        int weekDay, int month, String hour) {
+                                      setState(() {
+                                        _day = day;
+                                        _weekDay = weekDay;
+                                        _month = month;
+                                        _hour = hour;
+                                      });
+                                      print(hour);
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ),
+                              );
+                            });
+                      }
+                      // Navigator.push(context,
+                      //     MaterialPageRoute(builder: (context) => const Calendar()));
+                    },
+                  )
                 ],
               )),
-          CustomElevatedButton(
-            backgroundColor: yellowAccent,
-            textColor: black,
-            text: "ESCOLHER DATA E HORÁRIO",
-            fontSize: 16,
-            onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return Material(
-                      color: Colors.transparent,
-                      child: Container(
-                        constraints: const BoxConstraints.expand(),
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                width: 2,
-                                color: yellowAccent,
-                                style: BorderStyle.solid),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(10),
-                            ),
-                            image: const DecorationImage(
-                              image: AssetImage("images/background.png"),
-                              fit: BoxFit.cover,
-                            )),
-                        // decoration: BoxDecoration(color: black),
-                        margin: EdgeInsets.only(
-                            top: height * 0.04,
-                            right: 10,
-                            left: 10,
-                            bottom: height * 0.04),
-                        child: Calendar(
-                          returnValues: (var context, int day, int weekDay,
-                              int month, String hour) {
-                            print(hour);
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                    );
-                  });
-              // Navigator.push(context,
-              //     MaterialPageRoute(builder: (context) => const Calendar()));
-            },
-          )
-        ],
-      )),
+            )
+          : Center(
+              child: Container(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: Column(children: [
+                  SizedBox(
+                    height: height * 0.02,
+                  ),
+                  Text(
+                    "Seu agendamento foi concluído com sucesso!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                    ),
+                  ),
+                  SizedBox(
+                    height: height * 0.02,
+                  ),
+                  Appointments(
+                    day: _day,
+                    dayOfweek: _weekDay,
+                    month: _month,
+                    hour: _hour,
+                    service: service,
+                  ),
+                  SizedBox(
+                    height: height * 0.04,
+                  ),
+                  Text(
+                    "No menu abaixo você pode relembrar a data e horário do seu agendamento quando precisar.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: white,
+                        fontWeight: FontWeight.normal,
+                        fontSize: 16),
+                  ),
+                  SizedBox(
+                    height: height * 0.04,
+                  ),
+                  CustomElevatedButton(
+                      backgroundColor: yellowAccent,
+                      textColor: black,
+                      text: 'Cancelar',
+                      fontSize: 20,
+                      onPressed: () {
+                        setState(() {
+                          _day = 0;
+                          _weekDay = 0;
+                          _month = 0;
+                          _hour = " ";
+                        });
+                      })
+                ]),
+              ),
+            ),
     );
   }
 

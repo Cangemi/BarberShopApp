@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'About.dart';
 import 'Booking.dart';
 import 'PreviousAppointments.dart';
 import 'Profile.dart';
+import 'Services.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -23,10 +25,8 @@ class _HomeState extends State<Home> {
     Center(
       child: PreviousAppointments(),
     ),
-    const Center(
-      child: Text("2", style: TextStyle(color: Colors.white)),
-    ),
-    Booking()
+    const Services(),
+    const Booking()
   ];
 
   @override
@@ -52,13 +52,25 @@ class _HomeState extends State<Home> {
                     color: black,
                     fontStyle: FontStyle.italic,
                   ))),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return const About();
+                      });
+                },
+                icon: Icon(
+                  Icons.info_outline,
+                  color: black,
+                ))
+          ],
         ),
-        body: SingleChildScrollView(
-          child: Container(
-            height: height,
-            padding: const EdgeInsets.all(16),
-            child: screens[currentIndex],
-          ),
+        body: Container(
+          height: height,
+          padding: const EdgeInsets.all(16),
+          child: screens[currentIndex],
         ),
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: yellowAccent,
