@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../widgets/CustomElevatedButton.dart';
 import '../widgets/CustomTextField.dart';
+import 'Login.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
@@ -126,7 +127,18 @@ class _RegisterState extends State<Register> {
                           senha.text.isEmpty ||
                           confirmacaoSenha.text.isEmpty) {
                         message("Preencha todos os campos");
-                      } else {}
+                      } else {
+                        if (confirmacaoSenha.text != senha.text) {
+                          message("A senha está incorreta");
+                        } else {
+                          // Salvar senha
+                          message("Cadastro realizado com sucesso");
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Login()));
+                        }
+                      }
                     },
                     backgroundColor: yellowAccent,
                     textColor: black,

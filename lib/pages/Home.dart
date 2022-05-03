@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'About.dart';
 import 'Booking.dart';
+import 'Login.dart';
 import 'PreviousAppointments.dart';
 import 'Profile.dart';
 import 'Services.dart';
@@ -19,6 +20,7 @@ class _HomeState extends State<Home> {
   Color black = Colors.black87;
   Color yellow = Colors.yellow;
   Color white = Colors.white;
+  final String _nome = "José Fernando";
   int currentIndex = 3;
   List<Widget> screens = [
     const Profile(),
@@ -64,6 +66,15 @@ class _HomeState extends State<Home> {
                 icon: Icon(
                   Icons.info_outline,
                   color: black,
+                )),
+            IconButton(
+                onPressed: () {
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => const Login()));
+                },
+                icon: Icon(
+                  Icons.exit_to_app_outlined,
+                  color: black,
                 ))
           ],
         ),
@@ -93,6 +104,26 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
+    );
+  }
+
+  Container DrawerButton(BuildContext context, String text, Function onTap) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(0, 40, 10, 40),
+      decoration: BoxDecoration(
+          border: Border(
+        bottom: BorderSide(color: black, width: 2),
+      )),
+      child: TextButton(
+          onPressed: () {
+            onTap();
+          },
+          child: Text(
+            text,
+            style: TextStyle(color: black, fontSize: 20),
+            textAlign: TextAlign.left,
+          )),
     );
   }
 }

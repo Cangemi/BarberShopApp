@@ -111,13 +111,14 @@ class _LoginState extends State<Login> {
                   )),
                   CustomElevatedButton(
                     onPressed: () {
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Home()));
                       if (email.text != _email || senha.text != _senha) {
                         message("Email ou Senha incorreto");
-                      } else {}
+                      } else {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Home()));
+                      }
                     },
                     backgroundColor: yellowAccent,
                     textColor: black,
