@@ -22,11 +22,13 @@ class _HomeState extends State<Calendar> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
+  DateTime _today = DateTime.now();
   String _hour = " ";
   Color yellowAccent = Colors.yellowAccent;
   Color black = Colors.black87;
   Color yellow = Colors.yellow;
   Color white = Colors.white;
+  int flag = 0;
   final List<String> hourList = [
     "13:00",
     "14:00",
@@ -39,23 +41,36 @@ class _HomeState extends State<Calendar> {
 
   getHour() {
     print("DIA: ---- ${_selectedDay.day}");
-    for (appointmentsModel i in widget.appointmentsGeneralList) {
-      if (i.day == _selectedDay.day && i.month == _selectedDay.month) {
-        setState(() {
-          hList.remove(i.hour);
-        });
-      } else {
-        setState(() {
-          hList = [
-            "13:00",
-            "14:00",
-            "15:00",
-            "16:00",
-            "17:00",
-            "18:00",
-          ];
-        });
+    print(_selectedDay.isAtSameMomentAs(_today));
+    if (_selectedDay.isAfter(_today) ||
+        _selectedDay.day == _today.day &&
+            _selectedDay.month == _today.month &&
+            _selectedDay.year == _today.year) {
+      print("Entrou aqui");
+      for (appointmentsModel i in widget.appointmentsGeneralList) {
+        if (i.day == _selectedDay.day && i.month == _selectedDay.month) {
+          setState(() {
+            flag = 0;
+            hList.remove(i.hour);
+          });
+        } else {
+          setState(() {
+            flag = 0;
+            hList = [
+              "13:00",
+              "14:00",
+              "15:00",
+              "16:00",
+              "17:00",
+              "18:00",
+            ];
+          });
+        }
       }
+    } else {
+      setState(() {
+        flag = 1;
+      });
     }
   }
 
@@ -76,8 +91,11 @@ class _HomeState extends State<Calendar> {
           padding: const EdgeInsets.only(right: 20, left: 20),
           height: height,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              SizedBox(
+                height: height * 0.15,
+              ),
               Text(
                 "Agendamento",
                 style: TextStyle(
@@ -98,7 +116,7 @@ class _HomeState extends State<Calendar> {
               SizedBox(
                 height: height * 0.02,
               ),
-              hList.isNotEmpty
+              flag == 0
                   ? CustomTabBar(
                       list: hList,
                       backgroundColor: black,
@@ -106,15 +124,19 @@ class _HomeState extends State<Calendar> {
                       textColor: yellowAccent,
                       returnHour: (String value) => _hour = value,
                     )
-                  : Text(
-                      "Não possui horários para esta data",
-                      style: TextStyle(color: yellowAccent, fontSize: 18),
+                  : Container(
+                      padding: const EdgeInsetsDirectional.all(10),
+                      child: Text(
+                        "Não possui horários para esta data",
+                        style: TextStyle(color: yellowAccent, fontSize: 18),
+                      ),
                     ),
               SizedBox(
                 height: height * 0.02,
               ),
               CustomElevatedButton(
-                  backgroundColor: yellowAccent,
+                  backgroundColor:
+                      flag == 0 ? yellowAccent : Colors.grey.shade500,
                   textColor: black,
                   text: "CONFIRMAR AGENDAMENTO",
                   fontSize: 16,

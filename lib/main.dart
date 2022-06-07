@@ -27,12 +27,12 @@ void main() async {
 
   const _scopes = [CalendarApi.calendarScope];
 
-  var _credentials;
-  if (Platform.isAndroid) {
-    _credentials = ClientId(Secret.ANDROID_CLIENT_ID, "");
-  } else if (Platform.isIOS) {
-    _credentials = ClientId(Secret.IOS_CLIENT_ID, "");
-  }
+  // var _credentials;
+  // if (Platform.isAndroid) {
+  //   _credentials = ClientId(Secret.ANDROID_CLIENT_ID, "");
+  // } else if (Platform.isIOS) {
+  //   _credentials = ClientId(Secret.IOS_CLIENT_ID, "");
+  // }
 
   final tokenSave = await SharedPreferences.getInstance();
   String? token = await tokenSave.getString("token");
