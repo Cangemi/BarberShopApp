@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/CustomElevatedButton.dart';
 import '../widgets/CustomTextField.dart';
@@ -59,8 +61,9 @@ class _LoginState extends State<Login> {
           body: SingleChildScrollView(
             child: Container(
               padding: const EdgeInsets.all(41),
+              height: height,
               child: Column(
-                // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   // SizedBox(
                   //   height: height * 0.01,
@@ -92,6 +95,7 @@ class _LoginState extends State<Login> {
                     key: form,
                     children: [
                       CustomTextField(
+                        textInputType: TextInputType.emailAddress,
                         textEditingController: email,
                         label: "E-mail",
                         controller: (TextEditingController value) =>
@@ -111,13 +115,34 @@ class _LoginState extends State<Login> {
                   )),
                   CustomElevatedButton(
                     onPressed: () {
-                      if (email.text != _email || senha.text != _senha) {
-                        message("Email ou Senha incorreto");
+                      if (email.text.isNotEmpty && senha.text.isNotEmpty) {
+                        FirebaseAuth.instance
+                            .signInWithEmailAndPassword(
+                                email: email.text, password: senha.text)
+                            .then((res) {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Home()));
+                          print("Login Ok");
+                        }).catchError((e) {
+                          //print("Login incorreto" + e.code.toString());
+                          switch (e.code) {
+                            case 'invalid-email':
+                              message("O formato do email é inválido");
+                              break;
+                            case 'user-not-found':
+                              message("Usuário não encontrado");
+                              break;
+                            case 'wrong-password':
+                              message("Senha ou Email incorretos");
+                              break;
+                            default:
+                              message(e.code.toString());
+                          }
+                        });
                       } else {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Home()));
+                        message("Preencha todos os campos");
                       }
                     },
                     backgroundColor: yellowAccent,

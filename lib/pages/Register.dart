@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -95,6 +97,7 @@ class _RegisterState extends State<Register> {
                         password: false,
                       ),
                       CustomTextField(
+                        textInputType: TextInputType.emailAddress,
                         textEditingController: email,
                         label: "E-mail",
                         controller: (TextEditingController value) =>
@@ -132,11 +135,39 @@ class _RegisterState extends State<Register> {
                           message("A senha está incorreta");
                         } else {
                           // Salvar senha
-                          message("Cadastro realizado com sucesso");
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Login()));
+                          FirebaseAuth.instance
+                              .createUserWithEmailAndPassword(
+                                  email: email.text, password: senha.text)
+                              .then((res) {
+                            FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(FirebaseAuth.instance.currentUser!.uid
+                                    .toString())
+                                .set({
+                              'uid': res.user!.uid.toString(),
+                              'nome': nome.text,
+                              'nascimento': "",
+                              'telefone': "",
+                            });
+
+                            message("Cadastro realizado com sucesso");
+                            Navigator.pop(context);
+                            // Navigator.pushReplacement(
+                            // context,
+                            // MaterialPageRoute(
+                            //     builder: (context) => const Login()));
+                          }).catchError((e) {
+                            switch (e.code) {
+                              case 'email-already-in-use':
+                                message("Esse Email já foi cadastrado");
+                                break;
+                              case 'invalid-email':
+                                message("O formato do email é inválido");
+                                break;
+                              default:
+                                message(e.code.toString());
+                            }
+                          });
                         }
                       }
                     },

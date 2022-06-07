@@ -2,11 +2,17 @@ import 'package:barber_shop_app/widgets/CustomTabBar.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../models/appointmentsModel.dart';
 import '../widgets/CustomElevatedButton.dart';
 
 class Calendar extends StatefulWidget {
   final Function returnValues;
-  const Calendar({Key? key, required this.returnValues}) : super(key: key);
+  final List<appointmentsModel> appointmentsGeneralList;
+  const Calendar(
+      {Key? key,
+      required this.returnValues,
+      required this.appointmentsGeneralList})
+      : super(key: key);
 
   @override
   _HomeState createState() => _HomeState();
@@ -21,7 +27,7 @@ class _HomeState extends State<Calendar> {
   Color black = Colors.black87;
   Color yellow = Colors.yellow;
   Color white = Colors.white;
-  List<String> hourList = [
+  final List<String> hourList = [
     "13:00",
     "14:00",
     "15:00",
@@ -29,6 +35,36 @@ class _HomeState extends State<Calendar> {
     "17:00",
     "18:00",
   ];
+  List<String> hList = [];
+
+  getHour() {
+    print("DIA: ---- ${_selectedDay.day}");
+    for (appointmentsModel i in widget.appointmentsGeneralList) {
+      if (i.day == _selectedDay.day && i.month == _selectedDay.month) {
+        setState(() {
+          hList.remove(i.hour);
+        });
+      } else {
+        setState(() {
+          hList = [
+            "13:00",
+            "14:00",
+            "15:00",
+            "16:00",
+            "17:00",
+            "18:00",
+          ];
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    hList = hourList;
+    getHour();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +73,10 @@ class _HomeState extends State<Calendar> {
     return SingleChildScrollView(
       child: Center(
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.only(right: 20, left: 20),
+          height: height,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 "Agendamento",
@@ -61,13 +98,18 @@ class _HomeState extends State<Calendar> {
               SizedBox(
                 height: height * 0.02,
               ),
-              CustomTabBar(
-                list: hourList,
-                backgroundColor: black,
-                borderColor: yellowAccent,
-                textColor: yellowAccent,
-                returnHour: (String value) => _hour = value,
-              ),
+              hList.isNotEmpty
+                  ? CustomTabBar(
+                      list: hList,
+                      backgroundColor: black,
+                      borderColor: yellowAccent,
+                      textColor: yellowAccent,
+                      returnHour: (String value) => _hour = value,
+                    )
+                  : Text(
+                      "Não possui horários para esta data",
+                      style: TextStyle(color: yellowAccent, fontSize: 18),
+                    ),
               SizedBox(
                 height: height * 0.02,
               ),
@@ -77,12 +119,13 @@ class _HomeState extends State<Calendar> {
                   text: "CONFIRMAR AGENDAMENTO",
                   fontSize: 16,
                   onPressed: () {
+                    print("AQUI: ${_selectedDay}");
                     widget.returnValues(
                         context,
                         _selectedDay.day,
                         _selectedDay.weekday,
                         _selectedDay.month,
-                        _hour == " " ? hourList[0] : _hour);
+                        _hour == " " ? hList[0] : _hour);
                   })
             ],
           ),
@@ -102,6 +145,7 @@ class _HomeState extends State<Calendar> {
         ),
       ),
       child: TableCalendar(
+        locale: 'pt_BR',
         rowHeight: 35,
         firstDay: DateTime.utc(2022, 01, 01),
         lastDay: DateTime.utc(2050, 12, 31),
@@ -166,6 +210,7 @@ class _HomeState extends State<Calendar> {
             setState(() {
               _selectedDay = selectedDay;
               _focusedDay = focusedDay;
+              getHour();
             });
           }
         },

@@ -6,27 +6,29 @@ class CustomTabBar extends StatefulWidget {
   final Color borderColor;
   final Color textColor;
   final Function returnHour;
-  const CustomTabBar(
-      {Key? key,
-      required this.list,
-      required this.backgroundColor,
-      required this.borderColor,
-      required this.textColor,
-      required this.returnHour})
-      : super(key: key);
+  const CustomTabBar({
+    Key? key,
+    required this.list,
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.textColor,
+    required this.returnHour,
+  }) : super(key: key);
 
   @override
   _CustomTabBarState createState() => _CustomTabBarState();
 }
 
 class _CustomTabBarState extends State<CustomTabBar>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late TabController tabController;
   List<Widget> widgetList = [];
 
   widgetListMaker(List list) {
     for (String text in list) {
-      widgetList.add(buildTab(text, widget.textColor));
+      setState(() {
+        widgetList.add(buildTab(text, widget.textColor));
+      });
     }
   }
 
@@ -41,8 +43,7 @@ class _CustomTabBarState extends State<CustomTabBar>
 
   @override
   void initState() {
-    tabController = TabController(length: widget.list.length, vsync: this);
-    widgetListMaker(widget.list);
+    // TODO: implement initState
     super.initState();
   }
 
@@ -54,6 +55,9 @@ class _CustomTabBarState extends State<CustomTabBar>
 
   @override
   Widget build(BuildContext context) {
+    tabController = TabController(length: widget.list.length, vsync: this);
+    widgetList = [];
+    widgetListMaker(widget.list);
     return TabBar(
         onTap: (value) {
           widget.returnHour(widget.list[value]);

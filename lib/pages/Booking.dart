@@ -1,11 +1,17 @@
+import 'package:barber_shop_app/widgets/BuildServices.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/appointmentsModel.dart';
 import '../widgets/Appointments.dart';
 import '../widgets/CustomElevatedButton.dart';
+import '../models/calendar_client.dart';
 import 'Calendar.dart';
 
 class Booking extends StatefulWidget {
-  const Booking({Key? key}) : super(key: key);
+  final Query appoitments;
+  const Booking({Key? key, required this.appoitments}) : super(key: key);
 
   @override
   State<Booking> createState() => _BookingState();
@@ -13,11 +19,10 @@ class Booking extends StatefulWidget {
 
 class _BookingState extends State<Booking> {
   int flag = 0;
-  int _day = 0;
-  int _weekDay = 0;
-  int _month = 0;
-  String _hour = "";
+  DateTime _date = DateTime.now();
   String service = "";
+  List list = [];
+  Map<String, dynamic> a = Map();
   Color yellowAccent = Colors.yellowAccent;
   Color black = Colors.black87;
   Color yellow = Colors.yellow;
@@ -26,6 +31,18 @@ class _BookingState extends State<Booking> {
   Color colorTwo = Colors.yellow;
   Color colorThree = Colors.yellow;
   Color colorFour = Colors.yellow;
+  late String _token = '';
+
+  late List<appointmentsModel> appointmentsList = [];
+  late List<appointmentsModel> appointmentsGeneralList = [];
+
+  getUserId() async {
+    final tokenSave = await SharedPreferences.getInstance();
+    String? token = await tokenSave.getString("token");
+    setState(() {
+      _token = token!;
+    });
+  }
 
   message(String text) {
     final snackBar = SnackBar(
@@ -40,257 +57,241 @@ class _BookingState extends State<Booking> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  DateTime startTime = DateTime.now();
+  DateTime endTime = DateTime.now().add(const Duration(days: 1));
+  CalendarClient calendarClient = CalendarClient();
+
+  saveAppointment(String token, String hour, int day, int weekDay, int month,
+      DateTime date, bool ativo) {
+    FirebaseFirestore.instance.collection('appointments').add({
+      'uid': token,
+      'dia': day,
+      'diaSemana': weekDay,
+      'mes': month,
+      'hora': hour,
+      'servico': service,
+      'ativo': ativo,
+      'dataRegistro': date,
+    });
+  }
+
+  updateAppointment(String id, String token, String hour, String service,
+      int day, int weekDay, int month, DateTime date, bool ativo) {
+    FirebaseFirestore.instance.collection('appointments').doc(id).set({
+      'uid': token,
+      'dia': day,
+      'diaSemana': weekDay,
+      'mes': month,
+      'hora': hour,
+      'servico': service,
+      'ativo': ativo,
+      'dataRegistro': date,
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getUserId();
+  }
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
-
+    //print(appointmentsList.length);
     return SingleChildScrollView(
-      child: _day == 0
-          ? Container(
-              padding: const EdgeInsets.only(left: 20, right: 20),
-              child: Center(
-                  child: Column(
-                children: [
-                  SizedBox(
-                    height: height * 0.04,
-                  ),
-                  Text(
-                    "Como podemos te ajudar?",
-                    style: TextStyle(
-                        color: white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22),
-                  ),
-                  SizedBox(
-                    height: height * 0.02,
-                  ),
-                  Text(
-                    "Clique no serviço que você precisa.",
-                    style: TextStyle(
-                        color: white,
-                        fontWeight: FontWeight.normal,
-                        fontSize: 16),
-                  ),
-                  SizedBox(
-                    height: height * 0.035,
-                  ),
-                  Container(
-                      height: height * 0.45,
-                      // padding: const EdgeInsets.only(left: 20, right: 20),
-                      child: GridView.count(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 15,
-                        crossAxisSpacing: 15,
-                        childAspectRatio:
-                            MediaQuery.of(context).size.aspectRatio * 1.9,
+      child: StreamBuilder(
+        stream: widget.appoitments.snapshots(),
+        builder: (context, AsyncSnapshot snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              return const Center(child: Text('Erro ao conectar no Firebase'));
+            case ConnectionState.waiting:
+              return Container();
+            default:
+              final dados = snapshot.requireData;
+              for (DocumentSnapshot ap in dados.docs) {
+                appointmentsModel e = appointmentsModel.fromJson(
+                    ap.data() as Map<String, dynamic>, ap.id);
+                if (e.ativo == true) {
+                  appointmentsGeneralList.add(e);
+                  if (e.uid == _token) {
+                    appointmentsList.add(e);
+                  }
+                }
+              }
+              print(appointmentsGeneralList
+                  .any((element) => element.ativo == true));
+              return appointmentsList.isNotEmpty
+                  ? Container(
+                      padding: const EdgeInsets.only(left: 10, right: 10),
+                      height: height - 100,
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Seu agendamento foi concluído com sucesso!",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22,
+                              ),
+                            ),
+                            SizedBox(
+                              height: height * 0.02,
+                            ),
+                            Appointments(
+                              day: appointmentsList[0].day,
+                              dayOfweek: appointmentsList[0].weekDay,
+                              month: appointmentsList[0].month,
+                              hour: appointmentsList[0].hour,
+                              service: appointmentsList[0].service,
+                            ),
+                            SizedBox(
+                              height: height * 0.04,
+                            ),
+                            Text(
+                              "No menu abaixo você pode relembrar a data e horário do seu agendamento quando precisar.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: white,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 16),
+                            ),
+                            SizedBox(
+                              height: height * 0.04,
+                            ),
+                            CustomElevatedButton(
+                                backgroundColor: yellowAccent,
+                                textColor: black,
+                                text: 'Cancelar',
+                                fontSize: 20,
+                                onPressed: () {
+                                  _date = DateTime.now();
+                                  updateAppointment(
+                                      appointmentsList[0].id!,
+                                      _token,
+                                      appointmentsList[0].hour,
+                                      appointmentsList[0].service,
+                                      appointmentsList[0].day,
+                                      appointmentsList[0].weekDay,
+                                      appointmentsList[0].month,
+                                      _date,
+                                      false);
+                                  appointmentsList.clear();
+                                  appointmentsGeneralList.clear();
+                                })
+                          ]),
+                    )
+                  : Container(
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: Center(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          buildServices(
-                              context,
-                              "https://images.pexels.com/photos/10024234/pexels-photo-10024234.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-                              "BARBA",
-                              colorOne,
-                              1),
-                          buildServices(
-                              context,
-                              "https://images.pexels.com/photos/1804638/pexels-photo-1804638.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-                              "CABELO",
-                              colorTwo,
-                              2),
-                          buildServices(
-                              context,
-                              "https://images.pexels.com/photos/7697394/pexels-photo-7697394.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-                              "CORTE KIDS",
-                              colorThree,
-                              3),
-                          buildServices(
-                              context,
-                              "https://images.pexels.com/photos/3998404/pexels-photo-3998404.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940flutter",
-                              "COMPLETO",
-                              colorFour,
-                              4),
+                          SizedBox(
+                            height: height * 0.04,
+                          ),
+                          Text(
+                            "Como podemos te ajudar?",
+                            style: TextStyle(
+                                color: white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22),
+                          ),
+                          SizedBox(
+                            height: height * 0.02,
+                          ),
+                          Text(
+                            "Clique no serviço que você precisa.",
+                            style: TextStyle(
+                                color: white,
+                                fontWeight: FontWeight.normal,
+                                fontSize: 16),
+                          ),
+                          SizedBox(
+                            height: height * 0.035,
+                          ),
+                          BuildServices(
+                              returnValues: (String value) => service = value),
+                          CustomElevatedButton(
+                            backgroundColor: yellowAccent,
+                            textColor: black,
+                            text: "ESCOLHER DATA E HORÁRIO",
+                            fontSize: 16,
+                            onPressed: () {
+                              if (service == "") {
+                                message("Escolha um serviço");
+                              } else {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Material(
+                                        color: Colors.transparent,
+                                        child: Container(
+                                          constraints:
+                                              const BoxConstraints.expand(),
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  width: 2,
+                                                  color: yellowAccent,
+                                                  style: BorderStyle.solid),
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                Radius.circular(10),
+                                              ),
+                                              image: const DecorationImage(
+                                                image: AssetImage(
+                                                    "images/background.png"),
+                                                fit: BoxFit.cover,
+                                              )),
+                                          // decoration: BoxDecoration(color: black),
+                                          margin: EdgeInsets.only(
+                                              top: height * 0.04,
+                                              right: 10,
+                                              left: 10,
+                                              bottom: height * 0.04),
+                                          child: Calendar(
+                                            appointmentsGeneralList:
+                                                appointmentsGeneralList,
+                                            returnValues: (var context,
+                                                int day,
+                                                int weekDay,
+                                                int month,
+                                                String hour) {
+                                              Navigator.pop(context);
+                                              if (day < _date.day) {
+                                                message(
+                                                    "Esse dia não esta mais disponivel");
+                                              } else {
+                                                _date = DateTime.now();
+                                                saveAppointment(
+                                                    _token,
+                                                    hour,
+                                                    day,
+                                                    weekDay,
+                                                    month,
+                                                    _date,
+                                                    true);
+                                                appointmentsList.clear();
+                                                appointmentsGeneralList.clear();
+                                              }
+
+                                              //-----------------------------------------
+                                            },
+                                          ),
+                                        ),
+                                      );
+                                    });
+                              }
+                            },
+                          )
                         ],
                       )),
-                  CustomElevatedButton(
-                    backgroundColor: yellowAccent,
-                    textColor: black,
-                    text: "ESCOLHER DATA E HORÁRIO",
-                    fontSize: 16,
-                    onPressed: () {
-                      if (service == "") {
-                        message("Escolha um serviço");
-                      } else {
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return Material(
-                                color: Colors.transparent,
-                                child: Container(
-                                  constraints: const BoxConstraints.expand(),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                          width: 2,
-                                          color: yellowAccent,
-                                          style: BorderStyle.solid),
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.circular(10),
-                                      ),
-                                      image: const DecorationImage(
-                                        image:
-                                            AssetImage("images/background.png"),
-                                        fit: BoxFit.cover,
-                                      )),
-                                  // decoration: BoxDecoration(color: black),
-                                  margin: EdgeInsets.only(
-                                      top: height * 0.04,
-                                      right: 10,
-                                      left: 10,
-                                      bottom: height * 0.04),
-                                  child: Calendar(
-                                    returnValues: (var context, int day,
-                                        int weekDay, int month, String hour) {
-                                      setState(() {
-                                        _day = day;
-                                        _weekDay = weekDay;
-                                        _month = month;
-                                        _hour = hour;
-                                      });
-                                      print(hour);
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ),
-                              );
-                            });
-                      }
-                      // Navigator.push(context,
-                      //     MaterialPageRoute(builder: (context) => const Calendar()));
-                    },
-                  )
-                ],
-              )),
-            )
-          : Center(
-              child: Container(
-                padding: const EdgeInsets.only(left: 10, right: 10),
-                child: Column(children: [
-                  SizedBox(
-                    height: height * 0.02,
-                  ),
-                  Text(
-                    "Seu agendamento foi concluído com sucesso!",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22,
-                    ),
-                  ),
-                  SizedBox(
-                    height: height * 0.02,
-                  ),
-                  Appointments(
-                    day: _day,
-                    dayOfweek: _weekDay,
-                    month: _month,
-                    hour: _hour,
-                    service: service,
-                  ),
-                  SizedBox(
-                    height: height * 0.04,
-                  ),
-                  Text(
-                    "No menu abaixo você pode relembrar a data e horário do seu agendamento quando precisar.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: white,
-                        fontWeight: FontWeight.normal,
-                        fontSize: 16),
-                  ),
-                  SizedBox(
-                    height: height * 0.04,
-                  ),
-                  CustomElevatedButton(
-                      backgroundColor: yellowAccent,
-                      textColor: black,
-                      text: 'Cancelar',
-                      fontSize: 20,
-                      onPressed: () {
-                        setState(() {
-                          _day = 0;
-                          _weekDay = 0;
-                          _month = 0;
-                          _hour = " ";
-                        });
-                      })
-                ]),
-              ),
-            ),
-    );
-  }
-
-  GestureDetector buildServices(
-      BuildContext context, String url, String text, Color color, int i) {
-    return GestureDetector(
-      onTap: () {
-        service = text;
-        print(service);
-        if (i == 1) {
-          setState(() {
-            colorOne = yellowAccent;
-            colorTwo = yellow;
-            colorThree = yellow;
-            colorFour = yellow;
-          });
-        } else if (i == 2) {
-          setState(() {
-            colorOne = yellow;
-            colorTwo = yellowAccent;
-            colorThree = yellow;
-            colorFour = yellow;
-          });
-        } else if (i == 3) {
-          setState(() {
-            colorOne = yellow;
-            colorTwo = yellow;
-            colorThree = yellowAccent;
-            colorFour = yellow;
-          });
-        } else {
-          setState(() {
-            colorOne = yellow;
-            colorTwo = yellow;
-            colorThree = yellow;
-            colorFour = yellowAccent;
-          });
-        }
-      },
-      child: Container(
-        decoration: BoxDecoration(
-            color: color,
-            border: Border.all(color: color, width: 2),
-            borderRadius: BorderRadius.circular(5)),
-        child: Column(
-          children: [
-            Expanded(
-                child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: NetworkImage(url), fit: BoxFit.cover),
-              ),
-            )),
-            Padding(
-              padding: const EdgeInsets.only(top: 5, bottom: 5),
-              child: Text(
-                text,
-                style: const TextStyle(
-                    color: Colors.black87,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14),
-                textAlign: TextAlign.center,
-              ),
-            )
-          ],
-        ),
+                    );
+          }
+        },
       ),
     );
   }

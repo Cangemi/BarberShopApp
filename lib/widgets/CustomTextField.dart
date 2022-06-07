@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController textEditingController;
@@ -6,18 +7,26 @@ class CustomTextField extends StatelessWidget {
   final String label;
   final String hint;
   final bool password;
+  final TextInputType? textInputType;
+  final int? mask;
   const CustomTextField(
       {Key? key,
       required this.controller,
       required this.label,
       required this.hint,
       required this.password,
-      required this.textEditingController})
+      required this.textEditingController,
+      this.textInputType,
+      this.mask})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     //TextEditingController textEditingController = TextEditingController();
+    final maskPhone = MaskTextInputFormatter(
+        mask: "(##) #####-####", filter: {"#": RegExp(r'[0-9]')});
+    final maskDate = MaskTextInputFormatter(
+        mask: " ##/##/####", filter: {"#": RegExp(r'[0-9]')});
     return Column(
       children: [
         SizedBox(
@@ -39,6 +48,12 @@ class CustomTextField extends StatelessWidget {
             onTap: () {
               controller(textEditingController);
             },
+            inputFormatters: mask == 1
+                ? [maskPhone]
+                : mask == 2
+                    ? [maskDate]
+                    : [],
+            keyboardType: textInputType ?? TextInputType.text,
             obscureText: password,
             style: const TextStyle(color: Colors.white),
             cursorColor: Colors.white,

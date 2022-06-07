@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'About.dart';
 import 'Booking.dart';
@@ -22,13 +25,39 @@ class _HomeState extends State<Home> {
   Color white = Colors.white;
   final String _nome = "José Fernando";
   int currentIndex = 3;
+
+  static CollectionReference appointments =
+      FirebaseFirestore.instance.collection('appointments');
+
+  @override
+  void initState() {
+    super.initState();
+    saveValue();
+    //appointments = FirebaseFirestore.instance.collection('appointments');
+  }
+
+  eraseValue() async {
+    final tokenSave = await SharedPreferences.getInstance();
+    await tokenSave.setString("token", "");
+  }
+
+  saveValue() async {
+    String uid = FirebaseAuth.instance.currentUser!.uid.toString();
+    final tokenSave = await SharedPreferences.getInstance();
+    await tokenSave.setString("token", uid);
+  }
+
   List<Widget> screens = [
     const Profile(),
     Center(
-      child: PreviousAppointments(),
+      child: PreviousAppointments(
+        appoitments: appointments,
+      ),
     ),
     const Services(),
-    const Booking()
+    Booking(
+      appoitments: appointments,
+    )
   ];
 
   @override
@@ -69,6 +98,8 @@ class _HomeState extends State<Home> {
                 )),
             IconButton(
                 onPressed: () {
+                  eraseValue();
+                  FirebaseAuth.instance.signOut();
                   Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => const Login()));
                 },
@@ -104,26 +135,6 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-    );
-  }
-
-  Container DrawerButton(BuildContext context, String text, Function onTap) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(0, 40, 10, 40),
-      decoration: BoxDecoration(
-          border: Border(
-        bottom: BorderSide(color: black, width: 2),
-      )),
-      child: TextButton(
-          onPressed: () {
-            onTap();
-          },
-          child: Text(
-            text,
-            style: TextStyle(color: black, fontSize: 20),
-            textAlign: TextAlign.left,
-          )),
     );
   }
 }
