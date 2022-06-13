@@ -40,8 +40,6 @@ class _HomeState extends State<Calendar> {
   List<String> hList = [];
 
   getHour() {
-    print("DIA: ---- ${_selectedDay.day}");
-    print(_selectedDay.isAtSameMomentAs(_today));
     if (_selectedDay.isAfter(_today) ||
         _selectedDay.day == _today.day &&
             _selectedDay.month == _today.month &&
